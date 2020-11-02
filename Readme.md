@@ -1,6 +1,22 @@
 My notes and base examples on how to set up and use Docker
 
-# resources:
+# Mental Model
+Docker lets you very easily create images (think of them as a file containing a virtual
+machine) that you then run in containers (the running virtual machine). It manages the running
+state of that virtual machine for you - restarting it across system restarts etc.
+
+- This means you can easily run your scripts (Deno) in a persistent way without
+  worrying about how to set up Deno or Node with systemd etc
+- It lets you group images together so you can have one container running an nginx image, a Deno 
+  app server image, and a database image
+- It lets containers talk to each other, so one key example is having an nginx+letencrypt container
+  that notices the creation of other webserver containers and automatically starts accepting
+  requests for their domain, creates SSL certs, proxies requests etc. This greatly simplifies the
+  deployment of websites (no messing around with systemd, nginx conf, and letencrypt)
+- All the docker commands can execute across any machine running docker (using docker contexts);
+  so with one command you can swap from dev, to staging, to prod
+
+# External resources:
 * https://www.docker.com/blog/how-to-deploy-on-remote-docker-hosts-with-docker-compose/
 * https://blog.logrocket.com/how-to-deploy-deno-applications-to-production/
 * https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
