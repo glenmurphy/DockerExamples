@@ -1,3 +1,5 @@
+My notes and base examples on how to set up and use Docker
+
 # resources:
 * https://www.docker.com/blog/how-to-deploy-on-remote-docker-hosts-with-docker-compose/
 * https://blog.logrocket.com/how-to-deploy-deno-applications-to-production/
