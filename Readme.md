@@ -1,4 +1,4 @@
-My naive notes and base examples on how to set up and use Docker. My experience has been that Docker makes deployment, maintenance, and management of services across machines (e.g. dev and prod) orders of magnitude easier, at the expense of having to learn a few new commands up-front.
+My naive notes and base examples on how to set up and use Docker. My early experience has been that Docker makes deployment, maintenance, and management of even the simplest services across machines (e.g. dev and prod) orders of magnitude easier, at the expense of having to learn a few new commands up-front.
 
 # Mental Model
 Docker lets you very easily build *images* (think of them as a file containing a virtual
@@ -14,12 +14,31 @@ state of that virtual machine for you - restarting it across system restarts etc
 - I use [dstart](https://github.com/glenmurphy/DockerExamples/blob/master/scripts/dstart.sh) on my development server to run my deno scripts (monitoring stuff) persistently. Another example might be a simple [appserver](https://github.com/glenmurphy/DockerExamples/tree/master/appserver)
 - I use [nginx-proxy](https://github.com/glenmurphy/DockerExamples/tree/master/nginx) on my prod server, and deploy servers behind it so they get SSL and domains set up (see [webserver](https://github.com/glenmurphy/DockerExamples/tree/master/webserver), and [socketserver](https://github.com/glenmurphy/DockerExamples/tree/master/socketserver))
 
-# External resources:
-* https://www.docker.com/blog/how-to-deploy-on-remote-docker-hosts-with-docker-compose/
-* https://blog.logrocket.com/how-to-deploy-deno-applications-to-production/
-* https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 
-# Setup (all machines)
+# Quick example
+
+This walks you through taking a Deno script (myscript.js) and running it in a persistent way.
+
+1. In the same directory as your script, create a file named 'Dockerfile' (case matters) containing:
+
+        FROM hayd/deno:latest  
+        EXPOSE 8000
+        WORKDIR /app
+        ADD . /app
+        RUN deno cache myscript.js
+        CMD ["run", "--allow-net", "myscript.js"]
+
+2. Build the image
+
+        docker build . --tag myscript_img
+
+3. Run the image
+
+        docker run -d --restart always myscript_img
+
+You're done! If you have docker set up to run on system startup ("systemctl enable docker" on most Linux distros), then your script will run always.
+
+# Setup (installing docker)
 https://docs.docker.com/engine/install/ubuntu/
 
     /bin/bash
@@ -49,21 +68,10 @@ https://docs.docker.com/engine/install/ubuntu/
 
     sudo systemctl enable docker
 
-# Local setup
-// install docker (depends on platform)
-
-    ssh-keygen
-
-    # linux: 
-    ssh-copy-id glen@[YOUR_SERVER_HOSTNAME]
-
-    # windows:
-    type $env:USERPROFILE\.ssh\id_rsa.pub | ssh [YOUR_SERVER_HOSTNAME] "cat >> .ssh/authorized_keys"
-
 # Project config
 
-### ./Dockerfile:
-This is the file that configures how your image is built. Here's an example showing a Deno setup that uses Deno bundle to package all the scripts so it doesn't need to fetch them at runtime (this can be a bit flaky so you can also drop it)
+### Dockerfile:
+This is the file that configures how your image is built. Here's an example showing a Deno setup that uses Deno bundle to package all the scripts so it doesn't need to fetch them at runtime (this can be a bit flaky so you can also drop it). You need to put this in a file named 'Dockerfile' (case sensitive) in the same directory as your code:
 
     FROM hayd/deno:latest  
     EXPOSE 8000
@@ -72,29 +80,40 @@ This is the file that configures how your image is built. Here's an example show
     RUN deno bundle winwing.mjs winwing.bundle.mjs
     CMD ["run", "--allow-net", "winwing.bundle.mjs"]
 
-### configure context (remote server):
+### Context (remote server):
 This lets you have all the consequences of your docker commands execute on a remote server (it also
-has to run docker, and you need working key-based authentication)
+has to run docker.
 
-    docker context create dev --docker host=ssh://glen@[YOUR_SERVER_HOSTNAME]
-    docker context use dev
+1. Set up key-based auth on the local machine:
 
-## build + deploy:
-This will build the image, and run it
+        ssh-keygen
+
+        # linux: 
+        ssh-copy-id glen@[YOUR_SERVER_HOSTNAME]
+
+        # windows:
+        type $env:USERPROFILE\.ssh\id_rsa.pub | ssh [YOUR_SERVER_HOSTNAME] "cat >> .ssh/authorized_keys"
+
+2. Create a docker context for your production server (which must have Docker installed, and should have MaxSessions 500 in sshd_config)
+
+        docker context create prod --docker host=ssh://glen@[YOUR_SERVER_HOSTNAME]
+        docker context use prod
+
+## Build + deploy:
+This will build the image, and run it on the context
 
     docker build . --tag monmon_img
     docker run -d --name monmon --restart always monmon_img
 
-### update:
+### Update:
 
     docker build . --tag monmon_img 
     docker rm --force monmon
     docker run -d --name monmon --restart always monmon_img
     docker image prune -f
 
-## build + deploy with docker-compose
-Docker compose lets you run multiple images together, but also provides a convenient way of
-describing the configuration of a single image
+## Build + deploy with docker-compose
+Docker compose lets you run multiple images together in one container, and also provides a convenient way of describing additional container configuration without having to use command line arguments
 
 ### ./docker-compose.yml:
 
