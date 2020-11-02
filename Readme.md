@@ -5,18 +5,14 @@ Docker lets you very easily create images (think of them as a file containing a 
 machine) that you then run in containers (the running virtual machine). It manages the running
 state of that virtual machine for you - restarting it across system restarts etc.
 
-- This means you can easily run your scripts (Deno) in a persistent way without
-  worrying about how to set up Deno or Node with systemd etc. As an example, the [dstart](https://github.com/glenmurphy/DockerExamples/blob/master/scripts/dstart.sh) script shows how you can run any Deno script persistently.
-- Using Docker Compose, you can group images together so you can have one container running an
-  nginx image, a Deno app server image, and a database image
-- Using Docker Contexts, all the docker commands can execute across any machine running docker;
-  so with one 'switch contexts' command you can have the results of your commands execute on the
-  local machine, staging, or prod
-- It lets you configure how containers talk to each other, so one key example is having an 
-  nginx+letencrypt container that notices the creation of other webserver containers and 
-  automatically starts accepting requests for their domain, creates SSL certs, proxies requests 
-  etc. This greatly simplifies the deployment of websites (no messing around with systemd, 
-  nginx conf, and letencrypt)
+- This means you can easily run your scripts (Deno) in a persistent way without worrying about how to set up Deno or Node with systemd etc. As an example, the [dstart](https://github.com/glenmurphy/DockerExamples/blob/master/scripts/dstart.sh) script shows how you can run any Deno script persistently.
+- Using Docker Compose, you can group images together so you can have one container running an nginx image, a Deno app server image, and a database image
+- Using Docker Contexts, all the docker commands can execute across any machine running docker; so with one 'switch contexts' command you can have the results of your commands execute on the local machine, staging, or prod
+- It lets you configure how containers talk to each other, so one key example is having an  nginx+letencrypt container that notices the creation of other webserver containers and automatically starts accepting requests for their domain, creates SSL certs, proxies requests etc. This greatly simplifies the deployment of websites (no messing around with systemd, nginx conf, and letencrypt)
+
+### How I use it
+- I use [dstart](https://github.com/glenmurphy/DockerExamples/blob/master/scripts/dstart.sh) on my development server to run my deno scripts (monitoring stuff) persistently. Another example might be a simple [appserver](https://github.com/glenmurphy/DockerExamples/tree/master/appserver)
+- I use [nginx-proxy](https://github.com/glenmurphy/DockerExamples/tree/master/nginx) on my prod server, and deploy servers behind it so they get SSL and domains set up (see [webserver](https://github.com/glenmurphy/DockerExamples/tree/master/webserver), and [socketserver](https://github.com/glenmurphy/DockerExamples/tree/master/socketserver))
 
 # External resources:
 * https://www.docker.com/blog/how-to-deploy-on-remote-docker-hosts-with-docker-compose/
