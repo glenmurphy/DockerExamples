@@ -1,0 +1,19 @@
+<script>
+var wsHost = (location.hostname.indexOf("dev") == -1) ?
+  "wss://ws." + location.hostname + ":443/" :
+  "ws://" + location.hostname + ":8004";
+
+var wssc = new WebSocket(wsHost);
+wssc.addEventListener("message", handleMessage);
+wssc.addEventListener("open", handleOpen);
+
+function handleOpen() {
+  wssc.send("hello");
+}
+
+function handleMessage(event) {
+  var message = event.data;
+  console.log("recv: " + message);
+  document.body.innerHTML += message;
+}
+</script>

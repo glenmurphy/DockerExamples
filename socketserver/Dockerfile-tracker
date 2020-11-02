@@ -1,0 +1,6 @@
+FROM hayd/deno:latest
+EXPOSE 8004
+WORKDIR /app
+COPY ./tracker/ /app/
+RUN deno cache tracker.js
+CMD ["run", "--allow-net", "tracker.js"]

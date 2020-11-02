@@ -1,0 +1,18 @@
+#  docker-compose -f server-app-compose.yaml up --force-recreate --build -d
+
+version: '3'
+services:
+  server-web-app:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: glenmurphy-html
+    environment:
+      VIRTUAL_HOST: test.staging.glenmurphy.com
+      LETSENCRYPT_HOST: test.staging.glenmurphy.com
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
