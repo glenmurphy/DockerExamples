@@ -6,22 +6,24 @@ machine) that you then run in containers (the running virtual machine). It manag
 state of that virtual machine for you - restarting it across system restarts etc.
 
 - This means you can easily run your scripts (Deno) in a persistent way without
-  worrying about how to set up Deno or Node with systemd etc
-- It lets you group images together so you can have one container running an nginx image, a Deno 
-  app server image, and a database image
-- It lets containers talk to each other, so one key example is having an nginx+letencrypt container
-  that notices the creation of other webserver containers and automatically starts accepting
-  requests for their domain, creates SSL certs, proxies requests etc. This greatly simplifies the
-  deployment of websites (no messing around with systemd, nginx conf, and letencrypt)
-- All the docker commands can execute across any machine running docker (using docker contexts);
-  so with one command you can swap from dev, to staging, to prod
+  worrying about how to set up Deno or Node with systemd etc. As an example, the [dstart](https://github.com/glenmurphy/DockerExamples/blob/master/scripts/dstart.sh) script shows how you can run any Deno script persistently.
+- Using Docker Compose, you can group images together so you can have one container running an
+  nginx image, a Deno app server image, and a database image
+- Using Docker Contexts, all the docker commands can execute across any machine running docker;
+  so with one 'switch contexts' command you can have the results of your commands execute on the
+  local machine, staging, or prod
+- It lets you configure how containers talk to each other, so one key example is having an 
+  nginx+letencrypt container that notices the creation of other webserver containers and 
+  automatically starts accepting requests for their domain, creates SSL certs, proxies requests 
+  etc. This greatly simplifies the deployment of websites (no messing around with systemd, 
+  nginx conf, and letencrypt)
 
 # External resources:
 * https://www.docker.com/blog/how-to-deploy-on-remote-docker-hosts-with-docker-compose/
 * https://blog.logrocket.com/how-to-deploy-deno-applications-to-production/
 * https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 
-# setup (all machines)
+# Setup (all machines)
 https://docs.docker.com/engine/install/ubuntu/
 
     /bin/bash
@@ -51,7 +53,7 @@ https://docs.docker.com/engine/install/ubuntu/
 
     sudo systemctl enable docker
 
-# local setup
+# Local setup
 // install docker (depends on platform)
 
     ssh-keygen
@@ -62,7 +64,7 @@ https://docs.docker.com/engine/install/ubuntu/
     # windows:
     type $env:USERPROFILE\.ssh\id_rsa.pub | ssh {IP-ADDRESS-OR-FQDN} "cat >> .ssh/authorized_keys"
 
-# project
+# Project config
 
 ### ./Dockerfile:
 This is the file that configures how your image is built
