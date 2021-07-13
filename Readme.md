@@ -36,7 +36,7 @@ This walks you through taking a Deno script (myscript.js) and running it in a pe
 
         docker run -d --restart always myscript_img
 
-You're done! If you have docker set up to run on system startup ("systemctl enable docker" on most Linux distros), then your script will run always.
+You're done! If you have docker set up to run on system startup ("systemctl enable docker" on most Linux distros), then your script will start on startup and keep running.
 
 # Setup (installing docker)
 https://docs.docker.com/engine/install/ubuntu/
@@ -92,7 +92,14 @@ has to run docker.
         ssh-copy-id glen@[YOUR_SERVER_HOSTNAME]
 
         # windows:
+        # 1. make sure ssh-agent is installed and working
+        
+        # cmd shell
         type $env:USERPROFILE\.ssh\id_rsa.pub | ssh [YOUR_SERVER_HOSTNAME] "cat >> .ssh/authorized_keys"
+        
+        # bash
+        cat ~/.ssh/id_rsa.pub >> ssh [YOUR_SERVER_HOSTNAME] "cat >> .ssh/authorized_keys"
+
 
 2. Create a docker context for your production server (which must have Docker installed, and should have MaxSessions 500 in sshd_config)
 
@@ -128,16 +135,21 @@ Docker compose lets you run multiple images together in one container, and also 
 
 ### run:
 
-    docker-compose up -d
+    docker-compose -f docker-compose.yaml up -d 
 
 ### update/rebuild:
 
     docker-compose build
-    docker-compose up -d
+    docker-compose -f docker-compose.yaml up -d 
 
+### Occasionally update your images
+
+    docker images
+    docker pull hayd/deno:latest
 
 # Miscellaneous notes
 
 * docker ps -a to see your images
 * sometimes the remote context thing has weird errors - set MaxSessions 500 in sshd_config on the server to fix
 * [volumes](https://thenewstack.io/docker-basics-how-to-share-data-between-a-docker-container-and-host/)
+* Sometimes you have to remove the secretstore/credentials line from ~/.docker/config.json
