@@ -1,16 +1,13 @@
-#docker-compose -f glenmurphy-app-compose.yaml up --force-recreate --build -d
-version: '3'
+# docker compose -f glenmurphy-app-compose.yaml up -d --build
 services:
   server-web-app:
-    restart: always
-    build:
-      dockerfile: Dockerfile
-      context: .
+    restart: unless-stopped
+    build: .
     environment:
       VIRTUAL_HOST: glenmurphy.com,www.glenmurphy.com
-      LETSENCRYPT_HOST: glenmurphy.com,www.glenmurphy.com
+      ACME_HOST: glenmurphy.com,www.glenmurphy.com
 
 networks:
   default:
-    external:
-      name: nginx-proxy
+    name: nginx-proxy
+    external: true

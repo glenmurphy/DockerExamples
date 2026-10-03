@@ -1,0 +1,4 @@
+# Your site's files go in this directory. They're kept out of git; this file
+# only exists so the directory does (otherwise the Dockerfile's COPY fails).
+*
+!.gitignore

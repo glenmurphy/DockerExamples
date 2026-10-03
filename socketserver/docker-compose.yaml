@@ -1,32 +1,28 @@
-#docker-compose -f docker-compose.yaml up --force-recreate --build -d
-version: '3'
+# docker compose up -d --build
 services:
   lfg-web:
-    restart: always
+    restart: unless-stopped
     container_name: lfg_web
     build:
-      dockerfile: ./Dockerfile-web
+      dockerfile: Dockerfile-web
       context: .
     environment:
       VIRTUAL_HOST: lfg4.staging.glenmurphy.com
-      LETSENCRYPT_HOST: lfg4.staging.glenmurphy.com
+      ACME_HOST: lfg4.staging.glenmurphy.com
 
   lfg-tracker:
-    restart: always
+    restart: unless-stopped
     container_name: lfg_tracker
     build:
-      dockerfile: ./Dockerfile-tracker
+      dockerfile: Dockerfile-tracker
       context: .
-    #ports:
-    #  - "8000:8000"
     environment:
+      # nginx-proxy terminates SSL on 443 and forwards to the only port
+      # Dockerfile-tracker EXPOSEs (8004), so there's no VIRTUAL_PORT
       VIRTUAL_HOST: ws.lfg4.staging.glenmurphy.com
-      VIRTUAL_PORT: 443
-      LETSENCRYPT_HOST: ws.lfg4.staging.glenmurphy.com
-      LETSENCRYPT_EMAIL: glen@glenmurphy.com
-      WEBSOCKETS: 1
+      ACME_HOST: ws.lfg4.staging.glenmurphy.com
 
 networks:
   default:
-    external:
-      name: nginx-proxy
+    name: nginx-proxy
+    external: true
