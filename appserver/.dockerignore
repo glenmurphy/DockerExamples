@@ -1,0 +1,4 @@
+# files that don't need to be copied into the image
+.dockerignore
+Dockerfile
+*.yaml

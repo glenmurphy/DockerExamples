@@ -1,6 +1,7 @@
-FROM hayd/deno:latest  
-EXPOSE 80
+FROM denoland/deno:2.9.7
+EXPOSE 8000
 WORKDIR /app
-ADD . /app
+COPY . .
 RUN deno cache server.js
+USER deno
 CMD ["run", "--allow-net", "server.js"]

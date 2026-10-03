@@ -1,6 +1,7 @@
-FROM denoland/deno:latest
+FROM denoland/deno:2.9.7
 EXPOSE 8004
 WORKDIR /app
-COPY ./tracker/ /app/
+COPY tracker/ .
 RUN deno cache tracker.js
+USER deno
 CMD ["run", "--allow-net", "tracker.js"]

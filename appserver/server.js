@@ -1,6 +1,2 @@
-import { serve } from "https://deno.land/std@0.75.0/http/server.ts";
-const s = serve({ port: 80 });
-console.log("http://localhost:80/");
-for await (const req of s) {
-  req.respond({ body: "Hello World\n" });
-}
+// nginx-proxy forwards to port 8000 because it's the only port the Dockerfile EXPOSEs
+Deno.serve({ port: 8000 }, () => new Response("Hello World\n"));
