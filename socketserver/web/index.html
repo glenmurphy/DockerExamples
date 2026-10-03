@@ -1,9 +1,16 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>socketserver</title>
+<pre id="log"></pre>
 <script>
-var wsHost = (location.hostname.indexOf("dev") == -1) ?
-  "wss://ws." + location.hostname + ":443/" :
-  "ws://" + location.hostname + ":8004";
+// Deployed (https), the tracker is behind nginx-proxy at wss://ws.[this hostname]/.
+// In development (plain http), it's running directly on port 8004 of this host.
+const wsHost = (location.protocol === "https:") ?
+  "wss://ws." + location.hostname + "/" :
+  "ws://" + location.hostname + ":8004/";
 
-var wssc = new WebSocket(wsHost);
+const wssc = new WebSocket(wsHost);
 wssc.addEventListener("message", handleMessage);
 wssc.addEventListener("open", handleOpen);
 
@@ -12,8 +19,9 @@ function handleOpen() {
 }
 
 function handleMessage(event) {
-  var message = event.data;
+  const message = event.data;
   console.log("recv: " + message);
-  document.body.innerHTML += message;
+  // append() adds the message as text, so it can't inject HTML into the page
+  document.getElementById("log").append(message + "\n");
 }
 </script>
